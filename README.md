@@ -26,7 +26,7 @@ mv torrenter $PREFIX/bin/
 
 - curl
 - fzf
-- rofi (alternaitve menu to fzf without terminal)
+- rofi (alternative menu to fzf without terminal)
 - dmenu (alternative menu without terminal)
 - webtorrent-cli (Streaming torrent)
 - peerflix (alternative to webtorrent)
