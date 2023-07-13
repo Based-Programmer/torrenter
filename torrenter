@@ -83,7 +83,7 @@ rarbg () {
 }
 
 nyaa () {
-    data="$(curl -sA 'Mozilla/5.0' "https://ny.iss.one/?f=1&c=1_2&s=seeders&q=$name" | tr -d '\n' | sed 's@a href="/view/[0-9]*" title="@\n@g' | sed -nE 's,([^"]*).*(magnet:\?xt=[^"]*).*\t\t*</td>\t\t*<td class="text-center">([^<]*)</td>\t\t*<td class="text-center" data-timestamp="[0-9]*">[^<]*</td>\t\t*<td class="text-center">([0-9]*)</td>\t\t*<td class="text-center">([0-9]*)</td>.*,\2 \1 | \3 | \4 SE | \5 LE,p')"
+    data="$(curl -sA 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/115.0' "https://nyaa.ink/?f=1&c=1_2&s=seeders&q=$name" | tr -d '\n' | sed 's@a href="/view/[0-9]*" title="@\n@g' | sed -nE 's,([^"]*).*(magnet:\?xt=[^"]*).*\t\t*</td>\t\t*<td class="text-center">([^<]*)</td>\t\t*<td class="text-center" data-timestamp="[0-9]*">[^<]*</td>\t\t*<td class="text-center">([0-9]*)</td>\t\t*<td class="text-center">([0-9]*)</td>.*,\2 \1 | \3 | \4 SE | \5 LE,p')"
     selection || $client $player "${magnet%% *}"
 }    
 
