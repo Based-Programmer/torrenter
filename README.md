@@ -1,5 +1,5 @@
 ## torrenter
-Stream torrent movies animes &amp; download them for your terminal
+Stream or download movies, animes from torrent sites from your terminal
 
 # Install
 
