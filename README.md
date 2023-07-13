@@ -17,7 +17,7 @@ sudo mv torrenter /usr/local/bin/
 ```sh
 pkg up -y && \
 pkg in curl fzf aria2 nodejs && \
-pnpm -g install webtorrent-cli && \
+npm -g install webtorrent-cli && \
 curl -L 'https://github.com/Based-Programmer/torrenter/raw/main/torrenter' -O && \
 chmod +x torrenter && \
 mv torrenter $PREFIX/bin/
