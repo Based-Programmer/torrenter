@@ -58,7 +58,7 @@ piratebay () {
 }
 
 based_1337x () {
-    data="$(curl -s "https://1337x.iitpiracy.ml/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://1337x.iitpiracy.ml\1 \2 | \5 | \3 SE | \4 LE,p')"
+    data="$(curl -s "https://www.1377x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://www.1377x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
     selection || $client $player "$(curl -s "${magnet%% *}" | grep -m1 -o 'magnet:?xt[^"]*')"
 }
 
