@@ -98,7 +98,7 @@ rarbg () {
 }
 
 nyaa () {
-    data="$(curl -s "https://nyaa.ink/?f=1&c=1_2&s=seeders&q=$name" | tr -d '\n' | sed 's@a href="/view/[0-9]*" title="@\n@g' | sed -nE 's,([^"]*).*(magnet:\?xt=[^"]*).*\t\t*</td>\t\t*<td class="text-center">([^<]*)</td>\t\t*<td class="text-center" data-timestamp="[0-9]*">[^<]*</td>\t\t*<td class="text-center">([0-9]*)</td>\t\t*<td class="text-center">([0-9]*)</td>.*,\2 \1 | \3 | \4 SE | \5 LE,p')"
+    data="$(curl -s --retry 3 "https://nyaa.ink/?f=1&c=1_2&s=seeders&q=$name" | tr -d '\n' | sed 's@a href="/view/[0-9]*" title="@\n@g' | sed -nE 's,([^"]*).*(magnet:\?xt=[^"]*).*\t\t*</td>\t\t*<td class="text-center">([^<]*)</td>\t\t*<td class="text-center" data-timestamp="[0-9]*">[^<]*</td>\t\t*<td class="text-center">([0-9]*)</td>\t\t*<td class="text-center">([0-9]*)</td>.*,\2 \1 | \3 | \4 SE | \5 LE,p')"
     select_and_play
 }    
 
@@ -107,19 +107,18 @@ animetosho () {
     select_and_play
 }    
 
-[ -t 0 ] && {
-    while getopts 'vmdgqixpyernawfh' OPT; do
-	case $OPT in
+while getopts 'vmdgqixpyernawfh' OPT; do
+    case $OPT in
         v) player='vlc' ;;
         m) player='mpv';;
         d) player='aria2c' ;;
-	g) player='printf %s\n' ;;
+        g) player='printf %s\n' ;;
         q) player='qbittorrent' ;;
         i) player='mpv --force-window=immediate --speed=1' ;;
         x) torrent='based_1337x' ;;
         p) torrent='piratebay' ;;
-	y) torrent='yts' ;;
-	e) torrent='eztv' ;;
+        y) torrent='yts' ;;
+        e) torrent='eztv' ;;
         r) torrent='rarbg' ;;
         n) torrent='nyaa' ;;
         a) torrent='animetosho' ;;
@@ -144,7 +143,7 @@ animetosho () {
     -x Scrape 1337x
     -p Scrape PirateBay
     -y Scrape yts
-    -e Scrape eztv
+    -e Scrape eztv or yify
     -r Scrape Rarbg
     -n Scrape Nyaa
     -a Scrape Animetosho (Fast Nyaa Proxy & more)
@@ -183,7 +182,6 @@ animetosho () {
 	esac
 done
 shift $((OPTIND - 1))
-}
 
 [ "${player%% *}" = 'mpv' ] || [ "$player" = 'vlc' ] && dep_ch "$client" && [ "$player" != 'mpv --force-window=immediate --speed=1' ] || unset client
 
