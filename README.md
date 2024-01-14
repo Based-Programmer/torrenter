@@ -1,8 +1,8 @@
 # torrenter
 Stream or download movies, animes from torrent sites from your terminal
 
-#### I highly recommend using a curl version which supports http3 like https://github.com/stunnel/static-curl/releases if u don't wanna use a vpn
-- download & extract the binary & rename it to smth like curl3 then move it to /usr/local/bin/
+#### I highly recommend using a curl version which supports http3 like [this](https://github.com/stunnel/static-curl/releases) if u don't wanna use a vpn
+- download & extract the binary & rename it to smth like `curl3` then move it to `/usr/local/bin/`
 - In ur .zprofile, .bash_profile, or .fish_profile ?
 ````sh
 export HTTP3_CURL_CMD='curl3 -s --http3'
@@ -37,10 +37,14 @@ mv torrenter $PREFIX/bin/
 ## Dependencies
 
 - curl
-- fzf
+- fzf (menu)
+- webtorrent-cli (Streaming torrent)
+- mpv (best media player ever)
+- aria2 (Optimal, for downloading)
+
+## Optimal Dependencies
+
 - rofi (alternative menu to fzf without terminal)
 - dmenu (alternative menu without terminal)
-- webtorrent-cli (Streaming torrent)
 - peerflix (alternative to webtorrent)
-- mpv (Streaming video)
-- aria2 (Optimal, for downloading)
+- aria2 (for downloading)
