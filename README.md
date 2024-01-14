@@ -34,13 +34,13 @@ curl -L 'https://github.com/Based-Programmer/torrenter/raw/main/torrenter' -O &&
 chmod +x torrenter && \
 mv torrenter $PREFIX/bin/
 ```
+
 ## Dependencies
 
 - curl
 - fzf (menu)
 - webtorrent-cli (Streaming torrent)
 - mpv (best media player ever)
-- aria2 (Optimal, for downloading)
 
 ## Optimal Dependencies
 
