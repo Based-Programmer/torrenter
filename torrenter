@@ -44,6 +44,8 @@ menu () {
 
 selection () {
     [ -z "$data" ] && msg 'No Result' '\033[1;31m' && exit 1
+    # Unescape html chars
+    data="$(printf '%s' "$data" | sed -E 's/&(quot|#34);/"/g;s/&(apos|#x27|#39);/\x27/g;s/&amp;/\&/g;s/&lt;/</g;s/&gt;/>/g;s/&#40;/(/g;s/&#41;/)/g')"
 
     if [ -t 0 ]; then
 	magnet="$(printf '%s' "$data" | fzf --with-nth 2.. --reverse --cycle --prompt 'Select a Torrent: ' --keep-right --preview "printf '%s' {} | sed 's/[^ ]*//'" --preview-label 'Torrent Name' --preview-window "down,$preview_box_size,nohidden:wrap")"
@@ -98,7 +100,14 @@ rarbg () {
 }
 
 nyaa () {
-    data="$(curl -s --retry 3 "https://nyaa.ink/?f=1&c=1_2&s=seeders&q=$name" | tr -d '\n' | sed 's@a href="/view/[0-9]*" title="@\n@g' | sed -nE 's,([^"]*).*(magnet:\?xt=[^"]*).*\t\t*</td>\t\t*<td class="text-center">([^<]*)</td>\t\t*<td class="text-center" data-timestamp="[0-9]*">[^<]*</td>\t\t*<td class="text-center">([0-9]*)</td>\t\t*<td class="text-center">([0-9]*)</td>.*,\2 \1 | \3 | \4 SE | \5 LE,p')"
+    count=0
+    max_retries=6
+
+    while [ -z "$data" ] && [ $count -lt $max_retries ]; do
+        data="$($http3_curl_cmd "https://nyaa.unblockit.date/?f=1&c=1_2&s=seeders&q=$name" | tr -d '\n' | sed 's@a href="/view/[0-9]*" title="@\n@g' | sed -nE 's,([^"]*).*(magnet:\?xt=[^"]*).*\t\t*</td>\t\t*<td class="text-center">([^<]*)</td>\t\t*<td class="text-center" data-timestamp="[0-9]*">[^<]*</td>\t\t*<td class="text-center">([0-9]*)</td>\t\t*<td class="text-center">([0-9]*)</td>.*,\2 \1 | \3 | \4 SE | \5 LE,p')"
+        : $((count+=1))
+    done
+
     select_and_play
 }    
 
