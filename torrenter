@@ -2,8 +2,7 @@
 
 player="${TORRENTER_PLAYER:-mpv}"
 client="${TORRENTER_CLIENT:-webtorrent}"
-http3_curl_cmd="${HTTP3_CURL_CMD:-curl -sv --retry-all-errors --retry 5 --tcp-fastopen}"
-[ -t 0 ] && torrent="${TORRENTER_TORRENT:-x1337x}" || torrent="$TORRENTER_EXTERNAL_MENU_TORRENT"
+[ -t 0 ] && torrent="${TORRENTER_TORRENT:-piratebay}" || torrent="$TORRENTER_EXTERNAL_MENU_TORRENT"
 menu="${TORRENTER_EXTERNAL_MENU:-rofi}"
 nyaa_max_retries="${NYAA_MAX_RETRIES:-6}"
 preview_box_size=13%
@@ -38,7 +37,7 @@ print_help () {
     Defaults:
     client: webtorrent
     player: mpv
-    torrent site: 1337x
+    torrent site: piratebay
     external menu: rofi
     torrent site for external menu: eztv
     Options:
@@ -77,12 +76,6 @@ print_help () {
     export TORRENTER_CLIENT=peerflix
     export TORRENTER_EXTERNAL_MENU=dmenu
     export TORRENTER_EXTERNAL_MENU_TORRENT=rarbg
-
-    \033[1;33mI highly recommend using a curl version which supports http3\033[0m like https://github.com/stunnel/static-curl/releases
-    if u don't wanna use a vpn
-    download & extract the binary & rename it to smth like curl3 then move it to /usr/local/bin/
-    In ur .zprofile, .bash_profile, or .fish_profile ? export HTTP3_CURL_CMD='curl3 -s --http3'
-    or in ~/.config/torrenter/config http3_curl_cmd='curl3 -s --http3'
 
     Supported Players: mpv, vlc, aria2c, qbittorrent
     Supported Torrent Sites: 'x1337x', piratebay, yts, eztv, rarbg, nyaa, animetosho
@@ -132,31 +125,31 @@ exit_if_no_magnet_link() {
 }
 
 piratebay () {
-    data="$($http3_curl_cmd "https://thepiratebay.party/search/$name/1/99/0" | tr -d '\n' | sed 's,https://thepiratebay\.party/torrent/,\n,g' | sed -nE 's,[^"]*" title="[^"]*">(.*)</a>.*(magnet:\?xt=[^"]*).*<td align="right">([.0-9]*)&nbsp\;([^<]*)</td>.<td align="right">([0-9]*)</td>.<td align="right">([0-9]*)</td>.*,\2 \1 | \3 \4 | \5 SE | \6 LE,p')"
+    data="$(curl -s --http3 "https://thepiratebay.party/search/$name/1/99/0" | tr -d '\n' | sed 's,https://thepiratebay\.party/torrent/,\n,g' | sed -nE 's,[^"]*" title="[^"]*">(.*)</a>.*(magnet:\?xt=[^"]*).*<td align="right">([.0-9]*)&nbsp\;([^<]*)</td>.<td align="right">([0-9]*)</td>.<td align="right">([0-9]*)</td>.*,\2 \1 | \3 \4 | \5 SE | \6 LE,p')"
     select_and_play
 }
 
 x1337x () {
-    data="$($http3_curl_cmd "https://www.1377x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://www.1377x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
-    exit_if_no_magnet_link "$http3_curl_cmd"
+    data="$(curl -s --http3 "https://www.1377x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://www.1377x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
+    exit_if_no_magnet_link "curl -s --http3"
 }
 
 yts () {
-    real_data="$($http3_curl_cmd "https://yts.mx/api/v2/list_movies.json?sort=seeds&limit=30&query_term=$name")"
-    data="$(printf '%s' "$real_data" | sed 's/"id":/\n&/g' | sed -nE 's@"id":([^,]*).*"title(_long)?":"([^"]*).*"rating":([0-9\.]*).*@\1 \3 | \4@p')"
-    selection || title="${magnet% | *}" && data="$(printf '%s' "$real_data" | sed 's/"id":/\n&/g' | sed -nE "/\"id\":${magnet%% *}/ {s@[^{]*\{[^{]*hash\":\"([^\"]*)\",\"quality\":\"([^\"]*)\",\"type\":\"([^\"]*)\",\"is_repack\":\"[^\"]*\",\"video_codec\":\"[^\"]*\",\"bit_depth\":\"[^\"]*\",\"audio_channels\":\"[^\"]*\",\"seeds\":([0-9]*),\"peers\":([0-9]*),\"size\":\"([^\"]*)\"[^{]*@\1 \2 | \3 | \6 | \4 SE | \5 LE\n@pg}" | sed '/^{/d')"
+    resp="$(curl -s --http3 "https://yts.mx/api/v2/list_movies.json?sort=seeds&limit=30&query_term=$name" | sed 's/"id":/\n&/g')"
+    data="$(printf '%s' "$resp" | sed -nE 's@"id":([^,]*).*"title(_long)?":"([^"]*).*"rating":([0-9\.]*).*@\1 \3 | \4@p')"
+    selection || title="${magnet% | *}" && data="$(printf '%s' "$resp" | sed -nE "/\"id\":${magnet%% *}/ {s@[^{]*\{[^{]*hash\":\"([^\"]*)\",\"quality\":\"([^\"]*)\",\"type\":\"([^\"]*)\",\"is_repack\":\"[^\"]*\",\"video_codec\":\"[^\"]*\",\"bit_depth\":\"[^\"]*\",\"audio_channels\":\"[^\"]*\",\"seeds\":([0-9]*),\"peers\":([0-9]*),\"size\":\"([^\"]*)\"[^{]*@\1 \2 | \3 | \6 | \4 SE | \5 LE\n@pg}" | sed '/^{/d')"
     selection || $client $player "magnet:?xt=urn:btih:${magnet%% *}&dn=${title#* }&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&amp;tr=udp%3A%2F%2F9.rarbg.to%3A2710%2Fannounce&amp;tr=udp%3A%2F%2Fp4p.arenabg.ch%3A1337%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.cyberia.is%3A6969%2Fannounce&amp;tr=http%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&amp;tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce"
 }
 
 eztv () {
-    data="$($http3_curl_cmd "https://ww1.yify.world/movies?keyword=$name" | tr -d '\n' | sed 's@[[:space:]]<h4 class="rating">@\nclass="rating">@g' | sed -nE 's,^class="rating">([0-9\.]*).*<a href="(https://ww1\.yify\.world/[^"]*)" class="[^"]*">(.*)</a>[[:space:]]*<div class="browse-[^"]*">([0-9]*).*,\2 \3 | \1 | \4,p')"
+    data="$(curl -s --http3 "https://ww1.yify.world/movies?keyword=$name" | tr -d '\n' | sed 's@[[:space:]]<h4 class="rating">@\nclass="rating">@g' | sed -nE 's,^class="rating">([0-9\.]*).*<a href="(https://ww1\.yify\.world/[^"]*)" class="[^"]*">(.*)</a>[[:space:]]*<div class="browse-[^"]*">([0-9]*).*,\2 \3 | \1 | \4,p')"
     selection || data="$(curl -s "${magnet%% *}" | tr -d '\n' | sed 's/                    <tr>/\n/g' | sed -nE 's,[[:space:]]*<td>([^<]*)</td>[[:space:]]*<td>([^<]*)</td>[[:space:]]*<td>([^<]*)</td>.*href="(magnet:\?xt=[^"]*).*,\4 \2 | \1 | \3,p')"
     select_and_play
 }
 
 rarbg () {
-    data="$($http3_curl_cmd "https://www2.rarbggo.to/search/?search=$name" | tr -d '\n' | sed 's@<a href="/torrent/@\n@g' | sed -nE 's,([^"]*)" title="([^"]*) torrent">.*<td width="100px" class="tlista" align="center">([^<]*).*<td width="50px" class="tlista" align="center"><font color="#990000">([0-9]*).*<td width="50px" class="tlista" align="center">([0-9]*).*,https://www2.rarbggo.to/torrent/\1 \2 | \3 | \4 SE | \5 LE,p')"
-    exit_if_no_magnet_link "$http3_curl_cmd"
+    data="$(curl -s --http3 "https://www2.rarbggo.to/search/?search=$name" | tr -d '\n' | sed 's@<a href="/torrent/@\n@g' | sed -nE 's,([^"]*)" title="([^"]*) torrent">.*<td width="100px" class="tlista" align="center">([^<]*).*<td width="50px" class="tlista" align="center"><font color="#990000">([0-9]*).*<td width="50px" class="tlista" align="center">([0-9]*).*,https://www2.rarbggo.to/torrent/\1 \2 | \3 | \4 SE | \5 LE,p')"
+    exit_if_no_magnet_link "curl -s --http3"
 }
 
 nyaa () {
@@ -166,7 +159,7 @@ nyaa () {
         [ -z "$data" ] || printf '%s' "$data" | grep -q '<center><h1>302 Found</h1></center>'
      } && [ "$count" -lt "$nyaa_max_retries" ]; do
 
-        data="$($http3_curl_cmd "https://nyaa.unblockit.dad/?f=1$eng&s=seeders&q=$name")"
+        data="$(curl -s --http3 "https://nyaa.unblockit.africa/?f=1$eng&s=seeders&q=$name")"
         : $((count+=1))
     done
 
@@ -215,7 +208,7 @@ uname -a | grep -qE '[Aa]ndroid' && {
 }
 
 dep_ch "$player" curl
-[ -t 0 ] && dep_ch fzf || dep_ch "$menu"
+[ -t 0 ] && dep_ch fzf || dep_ch "$menu" notify-send
 
 [ "$err" = true ] && exit 1
 
