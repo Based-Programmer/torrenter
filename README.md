@@ -1,17 +1,9 @@
 # torrenter
 Stream or download movies, animes from torrent sites from your terminal
 
-#### I highly recommend using a curl version which supports http3 like [this](https://github.com/stunnel/static-curl/releases) if u don't wanna use a vpn
-- download & extract the binary & rename it to smth like `curl3` then move it to `/usr/local/bin/`
-- In ur .zprofile, .bash_profile, or .fish_profile ?
-````sh
-export HTTP3_CURL_CMD='curl3 -s --http3'
-````
-
-- OR in ~/.config/torrenter/config
-````sh
-http3_curl_cmd='curl3 -s --http3'
-````
+#### Update
+- 1337x doesn't work anymore bc its cloudfucked
+- eztv doesn't work either good alternative is yts
 
 ## Install
 
