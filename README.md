@@ -40,4 +40,4 @@ mv torrenter $PREFIX/bin/
 - dmenu (alternative menu without terminal)
 - peerflix (alternative to webtorrent)
 - aria2 (for downloading)
-- libnotify (only for alterative menus)
+- libnotify (only for alternative menus)
