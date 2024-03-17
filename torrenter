@@ -12,20 +12,26 @@ preview_box_size=13%
 #Checks Dependencies (plagarized from  ani-cli)
 dep_ch () { 
     for dep; do
-	    dep="${dep%% *}"
-	    if ! command -v "$dep" >/dev/null; then
-		    msg "Program \"$dep\" is not found" '\033[1;31m'
-		    case "$dep" in
+	      dep="${dep%% *}"
+	      if ! command -v "$dep" >/dev/null; then
+		        msg "Program \"$dep\" is not found" '\033[1;31m'
+		        case "$dep" in
 			#aria2c is in the package aria2
 			aria2c) msg 'To install aria2c, Type <your_package_manager> aria2' '\033[1;32m' ;;
-			webtorrent) msg "To install $dep, Type <your_package_manager> nodejs, then pnpm install -g webtorrent-cli" '\033[1;32m' ;;
-			peerflix) msg "To install $dep, Type <your_package_manager> nodejs, then pnpm install -g $dep" '\033[1;32m' ;;
+			webtorrent) msg "To install $dep, Type <your_package_manager> nodejs, then 'npm install -g webtorrent-cli'" '\033[1;32m' ;;
+			peerflix) msg "To install $dep, Type <your_package_manager> nodejs, then 'npm install -g $dep'" '\033[1;32m' ;;
 			mplayer | smplayer) printf '\033[1;32mWell, it seems like this is the first time you are running torrenter inside of Termux.
                 Torrenter uses mpv-android & vlc intents from $PREFIX/bin/mplayer & $PREFIX/bin/smplayer respectively, specifically for streaming using webtorrent or peerflix & opens that up in mpv-android or vlc so that it does not confict with normal mpv-android or vlc intents.You need to have mpv-android or vlc installed.
-                Do you want to setup $PREFIX/bin/mplayer & $PREFIX/bin/smplayer(y/n)\033[0m' && read -r REPLY && [ "$REPLY" = 'y' ] && printf 'am start --user 0 -a android.intent.action.VIEW -n org.videolan.vlc/org.videolan.vlc.gui.video.VideoPlayerActivity -d "${*##* }"' > $PREFIX/bin/smplayer && chmod +x "$PREFIX"/bin/smplayer && printf 'am start --user 0 -a android.intent.action.VIEW -n is.xyz.mpv/.MPVActivity -d "${*##* }"' > "$PREFIX"/bin/mplayer && chmod +x "$PREFIX"/bin/mplayer ;;
+                Do you want to setup $PREFIX/bin/mplayer & $PREFIX/bin/smplayer(y/n)\033[0m'
+			    read -r REPLY
+
+			    case "$REPLY" in
+				[yY] | 'Yes' | 'yes') printf 'am start --user 0 -a android.intent.action.VIEW -n org.videolan.vlc/org.videolan.vlc.gui.video.VideoPlayerActivity -d "${*##* }"' > $PREFIX/bin/smplayer && chmod +x "$PREFIX"/bin/smplayer && printf 'am start --user 0 -a android.intent.action.VIEW -n is.xyz.mpv/.MPVActivity -d "${*##* }"' > "$PREFIX"/bin/mplayer && chmod +x "$PREFIX"/bin/mplayer || err=true ;;
+				*) msg 'Aborted' '\033[1;31m' && err=true ;;
+			    esac
+    ;;
 			*) msg "To install $dep, Type <your_package_manager> $dep" '\033[1;32m' ;;
-		    esac	
-		    err=true
+		    esac
 	    fi
     done
 }
