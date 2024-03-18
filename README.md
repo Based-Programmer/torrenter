@@ -2,8 +2,14 @@
 Stream or download movies, animes from torrent sites from your terminal
 
 #### Update
-- 1337x doesn't work anymore bc its cloudfucked
-- eztv doesn't work either good alternative is yts
+- `eztv` doesn't work either, good alternative is `yts`
+
+#### Pro Tip
+- while playing, reload the video if it gets stuck
+- to do that bind a key in mpv `input.conf`
+````
+p      write-watch-later-config; loadfile "${path}"
+````
 
 ## Install
 
