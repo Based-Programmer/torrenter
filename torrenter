@@ -165,7 +165,7 @@ nyaa () {
         [ -z "$data" ] || printf '%s' "$data" | grep -q '<center><h1>302 Found</h1></center>'
      } && [ "$count" -lt "$nyaa_max_retries" ]; do
 
-        data="$(curl -s --http3 "https://nyaa.unblockit.africa/?f=1$eng&s=seeders&q=$name")"
+        data="$(curl -s --http3 "https://nyaa.unblockit.casa/?f=1$eng&s=seeders&q=$name")"
         : $((count+=1))
     done
 
