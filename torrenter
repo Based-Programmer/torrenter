@@ -2,7 +2,7 @@
 
 player="${TORRENTER_PLAYER:-mpv}"
 client="${TORRENTER_CLIENT:-webtorrent}"
-[ -t 0 ] && torrent="${TORRENTER_TORRENT:-piratebay}" || torrent="$TORRENTER_EXTERNAL_MENU_TORRENT"
+[ -t 0 ] && torrent="${TORRENTER_TORRENT:-x1337x}" || torrent="$TORRENTER_EXTERNAL_MENU_TORRENT"
 menu="${TORRENTER_EXTERNAL_MENU:-rofi}"
 nyaa_max_retries="${NYAA_MAX_RETRIES:-6}"
 preview_box_size=13%
