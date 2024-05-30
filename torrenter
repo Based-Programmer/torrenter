@@ -2,7 +2,7 @@
 
 player="${TORRENTER_PLAYER:-mpv}"
 client="${TORRENTER_CLIENT:-webtorrent}"
-[ -t 0 ] && torrent="${TORRENTER_TORRENT:-x1337x}" || torrent="$TORRENTER_EXTERNAL_MENU_TORRENT"
+[ -t 0 ] && torrent="${TORRENTER_TORRENT:-piratebay}" || torrent="$TORRENTER_EXTERNAL_MENU_TORRENT"
 menu="${TORRENTER_EXTERNAL_MENU:-rofi}"
 nyaa_max_retries="${NYAA_MAX_RETRIES:-6}"
 preview_box_size=13%
@@ -136,7 +136,7 @@ piratebay () {
 }
 
 x1337x () {
-    data="$(curl -s --http3 "https://www.1377x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://www.1377x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
+    data="$(curl -s --http3 "https://1337x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://www.1377x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
     exit_if_no_magnet_link "curl -s --http3"
 }
 
