@@ -122,10 +122,10 @@ select_and_play () {
 
 exit_if_no_magnet_link() {
     selection || { 
-	      magnet="$(curl -s $* "${magnet%% *}" | grep -m1 -o 'magnet:?xt[^"]*' || {
+	      magnet="$(curl -s $* "${magnet%% *}" | grep -m1 -o 'magnet:?xt=[^"]*')" || {
 	      msg "Magnet link wasn't found" '\033[1;31m'
 	      exit 1
-	})"
+	}
 	$client $player "$magnet"
     }    
 }
@@ -136,7 +136,7 @@ piratebay () {
 }
 
 x1337x () {
-    data="$(curl -s "$http3" "https://1337x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://www.1377x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
+    data="$(curl -s "$http3" "https://1337x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://1337x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
     exit_if_no_magnet_link "$http3"
 }
 
@@ -165,7 +165,7 @@ nyaa () {
         [ -z "$data" ] || printf '%s' "$data" | grep -q '<center><h1>302 Found</h1></center>'
      } && [ "$count" -lt "$nyaa_max_retries" ]; do
 
-        data="$(curl -sL "$http3" "https://nyaa.unblockit.ong/?f=1$eng&s=seeders&q=$name")"
+        data="$(curl -sL "$http3" "https://nyaa.unblockit.black/?f=1$eng&s=seeders&q=$name")"
         : $((count+=1))
     done
 
