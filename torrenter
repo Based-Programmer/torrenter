@@ -70,6 +70,8 @@ print_help () {
     -a Scrape Animetosho (Fast Nyaa Proxy & more)
     -w Use Webtorrent
     -f Use Peerflix
+    -u Update
+    -V Version
 
     You may add a config file in ~/.config/torrenter/config
     Eg:
