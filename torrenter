@@ -2,10 +2,11 @@
 
 player="${TORRENTER_PLAYER:-mpv}"
 client="${TORRENTER_CLIENT:-webtorrent}"
-[ -t 0 ] && torrent="${TORRENTER_TORRENT:-piratebay}" || torrent="$TORRENTER_EXTERNAL_MENU_TORRENT"
+[ -t 0 ] && torrent="${TORRENTER_TORRENT:-x1337x}" || torrent="$TORRENTER_EXTERNAL_MENU_TORRENT"
 menu="${TORRENTER_EXTERNAL_MENU:-rofi}"
-nyaa_max_retries="${NYAA_MAX_RETRIES:-6}"
 preview_box_size=13%
+version=0.2.0
+# nyaa_max_retries="${NYAA_MAX_RETRIES:-6}"
 
 [ -f ~/.config/torrenter/config ] && . ~/.config/torrenter/config
 
@@ -36,8 +37,14 @@ dep_ch () {
     done
 }
 
+update () {
+    sudo curl -s https://raw.githubusercontent.com/Based-Programmer/torrenter/refs/heads/main/torrenter -o "$(which torrenter)" && exit
+}
+
 print_help () {
     printf "
+    Version: %s
+
     Usage:
     torrenter <Options> <search term>
     Defaults:
@@ -86,7 +93,7 @@ print_help () {
     Supported Players: mpv, vlc, aria2c, qbittorrent
     Supported Torrent Sites: 'x1337x', piratebay, yts, eztv, rarbg, nyaa, animetosho
     Supported Clients: webtorrrent, peerflix
-" && exit
+" "$version" && exit 1
 }
 
 msg () {
@@ -122,11 +129,11 @@ select_and_play () {
 
 exit_if_no_magnet_link() {
     selection || { 
-	      magnet="$(curl -s $* "${magnet%% *}" | grep -m1 -o 'magnet:?xt=[^"]*')" || {
+	      magnet="$(curl -s $* "${magnet%% *}" | grep -m1 -Eo 'magnet:\?xt=[^"]+')" || {
 	      msg "Magnet link wasn't found" '\033[1;31m'
 	      exit 1
-	}
-	$client $player "$magnet"
+	      }
+	  $client $player "$magnet"
     }    
 }
 
@@ -136,7 +143,7 @@ piratebay () {
 }
 
 x1337x () {
-    data="$(curl -s "$http3" "https://1337x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.?<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://1337x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
+    data="$(curl -s "$http3" "https://1337x.to/search/$name/1/" | tr -d '\n' | sed 's,<i class="flaticon-[^"]*"></i></a><a href=",\n,g' | sed -nE 's,(^/torrent/[^"]*)">(.*)</a>.*<td class="coll-2 seeds">([0-9]*)</td>.*<td class="coll-3 leeches">([0-9]*)</td>.*<td class="coll-4 size mob-[^"]*">([^<]*).*,https://1337x.to\1 \2 | \5 | \3 SE | \4 LE,p')"
     exit_if_no_magnet_link "$http3"
 }
 
@@ -159,17 +166,7 @@ rarbg () {
 }
 
 nyaa () {
-    count=0
-
-    while {
-        [ -z "$data" ] || printf '%s' "$data" | grep -q '<center><h1>302 Found</h1></center>'
-     } && [ "$count" -lt "$nyaa_max_retries" ]; do
-
-        data="$(curl -s "$http3" "https://nyaa.iss.ink/?f=1$eng&s=seeders&q=$name")"
-        : $((count+=1))
-    done
-
-    data="$(printf '%s' "$data" | tr -d '\n' | sed 's@a href="/view/[0-9]*" title="@\n@g' | sed -nE 's,([^"]*).*(magnet:\?xt=[^"]*).*\t\t*</td>\t\t*<td class="text-center">([^<]*)</td>\t\t*<td class="text-center" data-timestamp="[0-9]*">[^<]*</td>\t\t*<td class="text-center">([0-9]*)</td>\t\t*<td class="text-center">([0-9]*)</td>.*,\2 \1 | \3 | \4 SE | \5 LE,p')"
+    data="$(curl -s --compressed "https://nyaa.si/?f=1$eng&s=seeders&q=$name" | tr -d '\n' | sed 's@a href="/view/[0-9]*" title="@\n@g' | sed -nE 's,([^"]*).*(magnet:\?xt=[^"]*).*\t\t*</td>\t\t*<td class="text-center">([^<]*)</td>\t\t*<td class="text-center" data-timestamp="[0-9]*">[^<]*</td>\t\t*<td class="text-center">([0-9]*)</td>\t\t*<td class="text-center">([0-9]*)</td>.*,\2 \1 | \3 | \4 SE | \5 LE,p')"
     select_and_play
 }    
 
@@ -178,7 +175,7 @@ animetosho () {
     select_and_play
 }    
 
-while getopts vmdgqixpyernEsawfh OPT; do
+while getopts vmdgqixpyernEsawfuVh OPT; do
     case $OPT in
         v) player=vlc ;;
         m) player=mpv ;;
@@ -196,6 +193,8 @@ while getopts vmdgqixpyernEsawfh OPT; do
         a) torrent=animetosho ;;
         w) client=webtorrent ;;
         f) client=peerflix ;;
+        u) update ;;
+        V) printf '%s\n' "$version" && exit ;;
         *) print_help ;;
 	  esac
 done
